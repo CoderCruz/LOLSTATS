@@ -8,7 +8,9 @@ const ChampIcon = ({ champData } = props) => {
   const getChampData = (name: string) => {
     const champData = champsArray.find(champ => champ.name === name);
     console.log(name, champData)
-    navigate('/champBuilder', { champInfo: champData })
+    navigate('/champBuilder', { 
+      state: champData 
+    });
   }
 
   return(

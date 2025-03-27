@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ChampIcon from './components/ChampIcon.tsx';
 import champBuilder from './pages/ChampBuilder.tsx';
@@ -9,8 +9,11 @@ function App() {
 
   async function getLeagueData() {
     try {
-      const leagueData = await axios.get('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion.json')
-      setLolData(leagueData.data.data); 
+
+      const versionData = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json');
+      const leagueData = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${versionData.data[0]}/data/en_US/champion.json`)
+      console.log(leagueData)
+      setLolData(leagueData.data.data);
       setLoading(false);
 
     }catch (error) {
