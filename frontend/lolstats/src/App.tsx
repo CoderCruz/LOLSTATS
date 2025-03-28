@@ -2,28 +2,18 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ChampIcon from './components/ChampIcon.tsx';
 import champBuilder from './pages/ChampBuilder.tsx';
+import { getLeagueData } from './services/lolData.ts';
 
 function App() {
   const [ lolData, setLolData ] = useState(null);
   const [loading, setLoading ] = useState<boolean>(true);
-
-  async function getLeagueData() {
-    try {
-
-      const versionData = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json');
-      const leagueData = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${versionData.data[0]}/data/en_US/champion.json`)
-      console.log(leagueData)
-      setLolData(leagueData.data.data);
-      setLoading(false);
-
-    }catch (error) {
-      console.log(`ERROR: ${error}`) 
-    }
-  }
-
+  
   useEffect(() => {
-    return () => {
-      getLeagueData();
+    return async () => {
+      const leagueData = await getLeagueData();
+      console.log(`LeagueData: ${leagueData}`)
+      setLolData(leagueData.data.data)
+      setLoading(false);
     }
   }, [])
 

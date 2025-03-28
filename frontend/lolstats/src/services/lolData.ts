@@ -1,25 +1,26 @@
 import axios from 'axios';
 
-
-export async function getLeagueData() {
+export const getLeagueData = async (): {} => {
     try {
       const versionData = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json');
       const leagueData = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${versionData.data[0]}/data/en_US/champion.json`)
-      console.log(leagueData)
       return leagueData;
-      setLolData(leagueData.data.data);
-      setLoading(false);
 
     }catch (error) {
       console.log(`ERROR: ${error}`) 
     }
   }
 
-export const getChampData = (name: string) => {
-    const champData = champsArray.find(champ => champ.name === name);
-    console.log(name, champData)
-    navigate('/champBuilder', { 
-      state: champData 
-    });
-  }
+export const getChampData = async (name: string, champArray: []): {} => {
+	console.log(champArray, ' jere')
+    if(!champArray) {
+	const leagueInfo = await getLeagueData().data.data;
+	const champsList: [] = Object.values(leagueInfo)
+	const champData = champList.find(champ => champ.name === name);
+	return champData; 	
+    } else {
+     return champArray.find(champ => champ.name === name);
+   }
+   
+}
 
