@@ -12,7 +12,7 @@ createRoot(document.getElementById('root')!).render(
       <Nav />
       <Routes>
         <Route index path="/" element={<App />} />
-        <Route path="/champBuilder" element={<ChampBuilder />} />
+        <Route path="/champ-builder" element={<ChampBuilder />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
