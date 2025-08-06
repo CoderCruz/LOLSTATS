@@ -1,10 +1,10 @@
-#LoL Stats
+# LoL Stats
 
 A real-time League of Legends stat calculator and item builder built with React. Choose a champion, equip items, and watch your stats update dynamically as you theorycraft different builds.
 
 ---
 
-##Purpose
+## Purpose
 
 This app lets users:
 - Select any champion from the current League of Legends patch
@@ -17,7 +17,7 @@ The goal is to give players an intuitive way to explore item builds, experiment 
 
 ---
 
-##Tech Stack
+## Tech Stack
 
 - **Frontend**: React + TypeScript
 - **State Management**: useState, useEffect (React hooks)
@@ -28,7 +28,7 @@ The goal is to give players an intuitive way to explore item builds, experiment 
 
 ---
 
-##Features
+## Features
 
 - Champion selection via Riot's official data
 - Fully interactive item slots (6 max)
