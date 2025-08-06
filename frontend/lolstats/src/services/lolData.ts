@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Champion from '../types.ts' 
+import { Champion } from '../types';
 
 const getVersion = async (): Promise<string> => {
   const res = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json');

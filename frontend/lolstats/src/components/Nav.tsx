@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { getLeagueData } from '../services/lolData.ts';
-
-interface Champion {
-  name: string;
-  image: {
-    full: string;
-  };
-  stats: Record<string, number>;
-}
+import { Champion } from '../types.ts';
 
 const Nav = () => {
   const [userInput, setUserInput] = useState('');

@@ -5,14 +5,15 @@ import { Champion } from './types';
 
 function App() {
 
-  const [lolData, setLolData] = useState<Record<string, Champion>>({});
+  const [lolData, setLolData] = useState<Champion[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   
   
   useEffect(() => {
     const fetchData = async () => {
       const leagueData = await getLeagueData();
-      setLolData(leagueData);
+      const champArray = Object.values(leagueData); // Convert object → array
+      setLolData(champArray);
       setLoading(false);
     };
 
