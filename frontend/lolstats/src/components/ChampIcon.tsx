@@ -3,7 +3,7 @@ import { getChampData } from '../services/lolData.ts';
 
 const ChampIcon = ({ champData }) => {
   const navigate = useNavigate();
-  const champsArray = Object.values(champData);
+  const champsArray = Object.values(champData ?? {});
   const imageBaseURL = 'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/champion/';
 
   const navigateChampBuilder = async (name) => {

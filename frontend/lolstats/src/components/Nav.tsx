@@ -2,24 +2,41 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { getLeagueData } from '../services/lolData.ts';
 
+interface Champion {
+  name: string;
+  image: {
+    full: string;
+  };
+  stats: Record<string, number>;
+}
+
 const Nav = () => {
   const [userInput, setUserInput] = useState('');
-  const [champions, setChampions] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
+  const [champions, setChampions] = useState<Champion[]>([]);
+  const [recommendations, setRecommendations] = useState<Champion[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchChamps = async () => {
-      const champs = await getLeagueData();
-      setChampions(Object.values(champs.data.data));
+      const champData = await getLeagueData();
+
+      if (!champData || typeof champData !== 'object') {
+        console.error('Invalid champ data structure:', champData);
+        return;
+      }
+
+      const championsArray = Object.values(champData);
+      setChampions(championsArray);
     };
 
     fetchChamps();
   }, []);
 
-  const onChampSearch = (e) => {
+  const onChampSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     setUserInput(input);
+
+    if (!champions.length) return;
 
     const filtered = champions.filter((champ) =>
       champ.name.toLowerCase().includes(input.toLowerCase())
@@ -27,7 +44,7 @@ const Nav = () => {
     setRecommendations(filtered);
   };
 
-  const handleSelect = (champ) => {
+  const handleSelect = (champ: Champion) => {
     navigate('/champ-builder', {
       state: {
         name: champ.name,
@@ -59,7 +76,7 @@ const Nav = () => {
           className="w-full bg-stone-800 border border-stone-700 rounded-md px-4 py-2 text-stone-200 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-600"
         />
         {recommendations.length > 0 && (
-          <ul className="absolute top-full left-0 mt-2 w-full bg-stone-900 border border-stone-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+          <ul className="absolute top-full left-0 mt-2 w-full bg-stone-900 border border-stone-700 rounded-md shadow-lg max-h-60 overflow-y-auto z-10">
             {recommendations.map((champ) => (
               <li
                 key={champ.name}
@@ -77,3 +94,4 @@ const Nav = () => {
 };
 
 export default Nav;
+

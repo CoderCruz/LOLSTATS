@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import ChampIcon from './components/ChampIcon.tsx';
 import { getLeagueData } from './services/lolData.ts';
@@ -6,11 +5,12 @@ import { getLeagueData } from './services/lolData.ts';
 function App() {
   const [lolData, setLolData] = useState(null);
   const [loading, setLoading] = useState<boolean>(true);
-
+  
+  
   useEffect(() => {
     const fetchData = async () => {
       const leagueData = await getLeagueData();
-      setLolData(leagueData.data.data);
+      setLolData(leagueData);
       setLoading(false);
     };
 
