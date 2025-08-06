@@ -4,23 +4,20 @@ import { getLeagueData } from './services/lolData.ts';
 import { Champion } from './types';
 
 function App() {
-
-  const [lolData, setLolData] = useState<Champion[] | null>(null);
+  const [lolData, setLolData] = useState<Record<string, Champion> | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  
-  
+
   useEffect(() => {
     const fetchData = async () => {
       const leagueData = await getLeagueData();
-      const champArray = Object.values(leagueData); // Convert object → array
-      setLolData(champArray);
+      setLolData(leagueData);
       setLoading(false);
     };
 
     fetchData();
   }, []);
 
-  if (loading) {
+  if (loading || !lolData) {
     return (
       <div className="min-h-screen w-full bg-gray-950 flex items-center justify-center text-stone-300 text-lg">
         Loading champions...
@@ -43,3 +40,4 @@ function App() {
 }
 
 export default App;
+
