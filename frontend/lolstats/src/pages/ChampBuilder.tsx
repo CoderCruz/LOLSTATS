@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router';
 import { useState, useEffect } from 'react';
 import { getItemData } from '../services/lolData.ts';
+import { Champion } from '../types';
 
 type ItemType = {
   stats: Record<string, number>;
@@ -11,21 +12,18 @@ type ItemType = {
 
 const ChampBuilder = () => {
   const location = useLocation();
-  const { state } = location;
-  const imageBaseURL =
-    'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/champion/';
-  const itemBaseURL =
-    'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/item/';
+  const champ = location.state as Champion;
 
-  const [baseStats] = useState(state.stats);
-  const [champStats, setChampStats] = useState(state.stats);
+  const imageBaseURL = 'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/champion/';
+  const itemBaseURL = 'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/item/';
+
+  const [baseStats] = useState(champ.stats);
+  const [champStats, setChampStats] = useState(champ.stats);
   const [allItems, setAllItems] = useState<ItemType[]>([]);
   const [items, setItems] = useState<ItemType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [userInput, setUserInput] = useState<string>('');
-  const [itemSlots, setItemSlots] = useState<(ItemType | null)[]>(
-    Array(6).fill(null)
-  );
+  const [itemSlots, setItemSlots] = useState<(ItemType | null)[]>(Array(6).fill(null));
 
   const statKeyMap: Record<string, string> = {
     FlatHPPoolMod: 'hp',
@@ -110,14 +108,14 @@ const ChampBuilder = () => {
       <div className="flex flex-col sm:flex-row h-1/2 gap-4">
         <img
           className="w-32 h-32 object-contain border border-stone-700 rounded mx-auto sm:mx-0"
-          src={`${imageBaseURL}${state.image.full}`}
-          alt={`image of ${state.name}`}
+          src={`${imageBaseURL}${champ.image.full}`}
+          alt={`image of ${champ.name}`}
         />
 
         <div className="flex flex-col flex-1 gap-4 overflow-y-auto">
           <div className="grid grid-cols-2 sm:flex sm:flex-wrap content-start gap-4">
             <div className="col-span-2 sm:w-full text-xl font-bold text-center sm:text-left">
-              {state.name}
+              {champ.name}
             </div>
             {Object.entries(champStats).map(([key, value]) => (
               <div
