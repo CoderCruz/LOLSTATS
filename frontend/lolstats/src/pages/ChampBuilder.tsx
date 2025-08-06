@@ -2,21 +2,48 @@ import { useLocation } from 'react-router';
 import { useState, useEffect } from 'react';
 import { getItemData } from '../services/lolData.ts';
 
+type ItemType = {
+  stats: Record<string, number>;
+  image: { full: string };
+  name: string;
+  maps?: Record<string, boolean>;
+};
+
 const ChampBuilder = () => {
   const location = useLocation();
   const { state } = location;
-  const imageBaseURL = 'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/champion/';
-  const itemBaseURL = 'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/item/';
+  const imageBaseURL =
+    'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/champion/';
+  const itemBaseURL =
+    'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/item/';
+
+  const [baseStats] = useState(state.stats);
   const [champStats, setChampStats] = useState(state.stats);
-  const [allItems, setAllItems] = useState([]);
-  const [items, setItems] = useState([]);
+  const [allItems, setAllItems] = useState<ItemType[]>([]);
+  const [items, setItems] = useState<ItemType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [userInput, setUserInput] = useState<string>("");
-  const [itemSlots, setItemSlots] = useState(Array(6).fill(null));
+  const [userInput, setUserInput] = useState<string>('');
+  const [itemSlots, setItemSlots] = useState<(ItemType | null)[]>(
+    Array(6).fill(null)
+  );
+
+  const statKeyMap: Record<string, string> = {
+    FlatHPPoolMod: 'hp',
+    FlatMPPoolMod: 'mp',
+    FlatPhysicalDamageMod: 'attackdamage',
+    FlatMagicDamageMod: 'spelldamage',
+    FlatArmorMod: 'armor',
+    FlatSpellBlockMod: 'spellblock',
+    PercentAttackSpeedMod: 'attackspeed',
+    FlatCritChanceMod: 'crit',
+    FlatMovementSpeedMod: 'movespeed',
+  };
 
   const getItems = async () => {
     const data = await getItemData();
-    const validItems = Object.values(data).filter((item: any) => item.maps?.["11"]);
+    const validItems = Object.values(data).filter(
+      (item: any) => item.maps?.['11']
+    ) as ItemType[];
     setItems(validItems);
     setAllItems(validItems);
     setLoading(false);
@@ -26,11 +53,44 @@ const ChampBuilder = () => {
     const input = e.target.value;
     setUserInput(input);
 
-    const filtered = allItems.filter((item: any) =>
+    const filtered = allItems.filter(item =>
       item.name.toLowerCase().includes(input.toLowerCase())
     );
 
     setItems(filtered);
+  };
+
+  const updateStats = (slots: (ItemType | null)[]) => {
+    const newStats = { ...baseStats };
+
+    slots.forEach(slot => {
+      if (slot) {
+        Object.entries(slot.stats).forEach(([statKey, value]) => {
+          const mappedKey = statKeyMap[statKey] || statKey;
+          newStats[mappedKey] = (Number(newStats[mappedKey]) || 0) + Number(value);
+        });
+      }
+    });
+
+    setChampStats(newStats);
+  };
+
+  const handleAddItem = (item: ItemType) => {
+    const slotIndex = itemSlots.findIndex(slot => slot === null);
+    if (slotIndex === -1) return;
+    const alreadyInSlots = itemSlots.some(slot => slot?.name === item.name);
+    if (alreadyInSlots) return;
+    const newSlots = [...itemSlots];
+    newSlots[slotIndex] = item;
+    setItemSlots(newSlots);
+    updateStats(newSlots);
+  };
+
+  const handleRemoveItem = (index: number) => {
+    const newSlots = [...itemSlots];
+    newSlots[index] = null;
+    setItemSlots(newSlots);
+    updateStats(newSlots);
   };
 
   useEffect(() => {
@@ -54,19 +114,41 @@ const ChampBuilder = () => {
           alt={`image of ${state.name}`}
         />
 
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap content-start gap-4 overflow-y-auto">
-          <div className="col-span-2 sm:w-full text-xl font-bold text-center sm:text-left">
-            {state.name}
-          </div>
-          {Object.entries(champStats).map(([key, value]) => (
-            <div
-              key={key}
-              className="bg-stone-800 p-2 rounded shadow w-full sm:w-40"
-            >
-              <h3 className="text-sm text-stone-400">{key}</h3>
-              <h3 className="text-md font-semibold">{value}</h3>
+        <div className="flex flex-col flex-1 gap-4 overflow-y-auto">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap content-start gap-4">
+            <div className="col-span-2 sm:w-full text-xl font-bold text-center sm:text-left">
+              {state.name}
             </div>
-          ))}
+            {Object.entries(champStats).map(([key, value]) => (
+              <div
+                key={key}
+                className="bg-stone-800 p-2 rounded shadow w-full sm:w-40"
+              >
+                <h3 className="text-sm text-stone-400">{key}</h3>
+                <h3 className="text-md font-semibold">{value}</h3>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-2 justify-center sm:justify-start">
+            {itemSlots.map((slot, index) => (
+              <div
+                key={index}
+                className="w-12 h-12 border border-stone-700 rounded flex items-center justify-center bg-stone-900 cursor-pointer"
+                onClick={() => handleRemoveItem(index)}
+              >
+                {slot ? (
+                  <img
+                    src={`${itemBaseURL}${slot.image.full}`}
+                    alt={slot.name}
+                    className="w-10 h-10 object-contain"
+                  />
+                ) : (
+                  <span className="text-stone-500 text-xs">Empty</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -84,9 +166,10 @@ const ChampBuilder = () => {
 
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 mt-4">
           {Array.isArray(items) &&
-            items.map((item: any, index) => (
+            items.map((item, index) => (
               <div
                 key={index}
+                onClick={() => handleAddItem(item)}
                 className="flex flex-col items-center bg-stone-800 p-2 rounded hover:bg-stone-700 cursor-pointer transition"
               >
                 <img
@@ -104,3 +187,4 @@ const ChampBuilder = () => {
 };
 
 export default ChampBuilder;
+
