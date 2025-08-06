@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import ChampIcon from './components/ChampIcon.tsx';
 import { getLeagueData } from './services/lolData.ts';
+import { Champion } from './types';
 
 function App() {
-  const [lolData, setLolData] = useState(null);
+
+  const [lolData, setLolData] = useState<Record<string, Champion>>({});
   const [loading, setLoading] = useState<boolean>(true);
   
   

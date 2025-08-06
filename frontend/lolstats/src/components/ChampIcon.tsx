@@ -1,12 +1,17 @@
+import { Champion } from '../types';
 import { useNavigate } from "react-router";
 import { getChampData } from '../services/lolData.ts';
 
-const ChampIcon = ({ champData }) => {
+interface ChampIconProps {
+  champData: Record<string, Champion>;
+}
+
+const ChampIcon = ({ champData }: ChampIconProps) => {
   const navigate = useNavigate();
-  const champsArray = Object.values(champData ?? {});
+  const champsArray = Object.values(champData);
   const imageBaseURL = 'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/champion/';
 
-  const navigateChampBuilder = async (name) => {
+  const navigateChampBuilder = async (name: string) => {
     const champInfo = await getChampData(name, champsArray);
     navigate('/champ-builder', {
       state: champInfo,
@@ -16,9 +21,9 @@ const ChampIcon = ({ champData }) => {
   return (
     <div className="w-full flex justify-center">
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 max-w-7xl w-full px-4">
-        {champsArray.map((champ, index) => (
+        {champsArray.map((champ) => (
           <div
-            key={index}
+            key={champ.name}
             className="bg-stone-800 hover:bg-stone-700 cursor-pointer p-2 rounded-md text-center transition duration-150"
             onClick={() => navigateChampBuilder(champ.name)}
           >
@@ -36,3 +41,4 @@ const ChampIcon = ({ champData }) => {
 };
 
 export default ChampIcon;
+

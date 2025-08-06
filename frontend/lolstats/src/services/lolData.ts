@@ -1,47 +1,36 @@
 import axios from 'axios';
-export const versionData = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json');
+import Champion from '../types.ts' 
 
-interface Champ {
-  name: string;
-  [key: string]: any;
-}
+const getVersion = async (): Promise<string> => {
+  const res = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json');
+  return res.data[0];
+};
 
-interface ChampDataResponse {
-  data: {
-    [champion: string]: Champ;
-  };
-}
-
-interface ItemDataResponse {
-  data: {
-    [key: string]: any;
-  };
-}
-
-export const getLeagueData = async (): Promise<Record<string, any>> => {
+export const getLeagueData = async (): Promise<Champion[]> => {
   try {
-    const res = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${versionData.data[0]}/data/en_US/champion.json`);
-    return res.data.data;
+    const version = await getVersion();
+    const res = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`);
+    const championsMap = res.data.data;
+    return Object.values(championsMap) as Champ[];
   } catch (error) {
     console.error(`ERROR in getLeagueData: ${error}`);
-    return {};
+    return [];
   }
 };
 
-export const getChampData = async (name: string, champArray?: Champ[]): Promise<Champ | undefined> => {
-  if (!champArray) {
-    const leagueInfo = await getLeagueData();
-    if (!leagueInfo) return undefined;
-    const champsList: Champ[] = Object.values(leagueInfo.data);
-    return champsList.find(champ => champ.name === name);
-  } else {
+export const getChampData = async (name: string, champArray?: Champion[]): Promise<Champion | undefined> => {
+  if (champArray && champArray.length > 0) {
     return champArray.find(champ => champ.name === name);
   }
+
+  const champsList = await getLeagueData();
+  return champsList.find(champ => champ.name === name);
 };
 
 export const getItemData = async (): Promise<{ [key: string]: any }> => {
   try {
-    const itemData = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${versionData.data[0]}/data/en_US/item.json`);
+    const version = await getVersion();
+    const itemData = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/item.json`);
     return itemData.data.data;
   } catch (error) {
     console.log(`ERROR: ${error}`);
